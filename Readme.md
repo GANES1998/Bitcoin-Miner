@@ -46,6 +46,17 @@ graph TB;
 ```
 #### Architecture of Worker
 ```mermaid
-graph TR;
-
+graph TB;
+    A[Initialized After getting spun] ---> B[Get Work Unit];
+    C[Environment Vars] -.-> B;
+    B ---> D[Loop];
+    D -.-> E[Generate Random Str];
+    C -.-> |Random Char Count| E;
+    E ---> F[Generate Input String];
+    G[User Input] -.-> |User Id| F;
+    F ---> H[Sha256 Hash];
+    H ---> I{Leading Zeros Check};
+    G -.-> |K - Min Leading Zeros| I;
+    I ---> |Yes| J[Send Message to Caller with Input String and Hash];
+    I ---> |No - Loop for maximum of work unit times| D;
 ```
