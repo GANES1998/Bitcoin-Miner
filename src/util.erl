@@ -1,13 +1,4 @@
-%%%-------------------------------------------------------------------
-%%% @author ganesonravichandran
-%%% @copyright (C) 2022, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 20. Sep 2022 1:31 pm
-%%%-------------------------------------------------------------------
 -module(util).
--author("ganesonravichandran").
 
 %% API
 -export([generate_random_str/1, concat_string/2, hash_sha256/1, get_zero_string/1, get_timestamp/0]).
