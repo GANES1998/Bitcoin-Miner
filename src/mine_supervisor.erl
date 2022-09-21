@@ -14,8 +14,9 @@
 supervise(K) ->
   io:format("K is ~p", [K]),
   Start = util:get_timestamp(),
+  WorkUnit = list_to_integer(os:getenv("WORK_UNIT", "100")),
   Cores = erlang:system_info(logical_processors_available),
-  MaxProcesses = Cores * os:getenv("PROCESS_PER_CORE", 2500000),
+  MaxProcesses = Cores * os:getenv("PROCESS_PER_CORE", 2500),
   lists:foreach(
     fun (_) ->
        _Pid = spawn_link(worker, main, [K, self()])
@@ -24,7 +25,7 @@ supervise(K) ->
   ),
   main_loop(0, 0, MaxProcesses),
   End= util:get_timestamp(),
-  io:format("[~p] processes took [~p] milli seconds running on [~p] logical cores~n", [MaxProcesses, End - Start, Cores]).
+  io:format("[~p] processes took [~p] milli seconds running on [~p] logical cores with Work Unit [~p] ~n", [MaxProcesses, End - Start, Cores, WorkUnit]).
 
 main_loop(WorkerCount, SuccessCount, MaxProcesses) ->
   case WorkerCount < MaxProcesses of
