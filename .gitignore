@@ -1,0 +1,8 @@
+# IDE Specific Files
+.idea/
+
+# Compiled Output binaries
+ebin/*.beam
+
+#Crash Log Files
+**/*.dump
