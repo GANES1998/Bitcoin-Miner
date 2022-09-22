@@ -3,10 +3,10 @@
 -export([supervise/1, main_loop/3]).
 
 supervise(K) ->
-  %%Start Wallclock Time
+  %% Start CPU time
+  statistics(runtime),
+  %% Start Wallclock Time
   Start = util:get_timestamp(),
-%%  %%CPU Monitoring Initialization
-%%  _CpuStart = cpu_sup:util(),
   %% Get Work Unit (Number of attepmts by each process before giving up)  from Env
   WorkUnit = list_to_integer(os:getenv("WORK_UNIT", "100")),
   %% Get Total Logical Cores in the system
@@ -22,14 +22,15 @@ supervise(K) ->
   ),
   %% Start the event listening part.
   main_loop(0, 0, MaxProcesses),
-  %% Calculate End Wall Clock time.
-  End = util:get_timestamp(),
   %% Stop the CPU Monitoring.
-%%  CpuEnd = cpu_sup:util(),
-%%  %% Print the CPU Utilization
-%%  io:format("Cup Time [~p]", [CpuEnd]),
+  {_, CPUTime} = statistics(runtime),
+  %% Calculate Wall Clock time.
+  End = util:get_timestamp(),
+  WallClockTime = End - Start,
   %% Print the result with stats
-  io:format("[~p] processes took [~p] milli seconds running on [~p] logical cores with Work Unit [~p] ~n", [MaxProcesses, End - Start, Cores, WorkUnit]).
+  io:format("[~p] processes took [~p] milli seconds CPU Time and [~p] milli seconds Wall clock time running on [~p] logical cores with Work Unit [~p] ~n", [MaxProcesses, CPUTime, WallClockTime, Cores, WorkUnit]),
+  Speedup = CPUTime/WallClockTime,
+  io:format("Speedup Achieved: ~p~n", [Speedup]).
 
 main_loop(WorkerCount, SuccessCount, MaxProcesses) ->
   %% Check if all workers have reported result.
