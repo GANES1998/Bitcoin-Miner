@@ -37,8 +37,8 @@ G --Dispatch--> A
 ```mermaid
 graph TB;
     A[K zeros] --User Input--> B[Supervisor];
-    B ---> C[Calclate Max Propcess Allowed];
-    D[Environment Var] --Processes/Core--> C;
+    B ---> C[Find the number of processes to be spun];
+    D[Environment Var] --Max Processes--> C;
     C ---> E[Spawn Processes];
     E ---> F[Listen for Events];
     F --loop--> F;
@@ -77,15 +77,15 @@ remain the same.
 The corresponding wall clock times were used to determine the best value of Work Unit. The results of this experiment
 are tabulated below.
 
-| Work Unit | Process Per Core | Cores | Max Process Spun | Max Attempts | Bitcoins Mined | Wall Clock Time (ms) |
-|-----------|------------------|-------|------------------|--------------|----------------|----------------------|
-| 10        | 25000            | 8     | 200000           | 2000000      | 40             | 274503               |
-| 50        | 5000             | 8     | 40000            | 2000000      | 27             | 15830                |
-| 100       | 2500             | 8     | 20000            | 2000000      | 24             | 13671                |
-| 200       | 1250             | 8     | 10000            | 2000000      | 25             | 12060                |
-| 500       | 550              | 8     | 2000             | 2000000      | 20             | 11706                |
+| Work Unit |  Max Process Spun | Max Attempts | Bitcoins Mined | Wall Clock Time (ms) |
+|-----------|-------------------|--------------|----------------|----------------------|
+| 10        |  200000           | 2000000      | 28             | 146667               |
+| 50        |  40000            | 2000000      | 21             | 19182                |
+| 100       |  20000            | 2000000      | 30             | 13717                |
+| 200       |  10000            | 2000000      | 30             | 12616                |
+| 500       |  2000             | 2000000      | 10             | 5744                 |
 
-So, when the work unit 50, we have a perfect balance of Bitcoins mined and Time Taken. So, I have chosen 50 as the work
+So, when the work unit 200, we have a perfect balance of Bitcoins mined and Time Taken. So, I have chosen 50 as the work
 unit.
 
 2. The result of running your program for input 4
@@ -93,12 +93,11 @@ unit.
 From the above experiment, the work unit was set to **50** and hence the process per core was set to 5000. The result of
 the program is shown below.
 
-| Work Unit | Process Per Core | Cores | Max Process Spun | Max Attempts | Bitcoins Mined | Wall Clock Time (ms) |
-|-----------|------------------|-------|------------------|--------------|----------------|----------------------|
-| 50        | 10000            | 8     | 80000            | 4000000      | 68             | 62927                |
+| Work Unit | Max Process Spun | Max Attempts | Bitcoins Mined | Wall Clock Time (ms) |
+|-----------|------------------|--------------|----------------|----------------------|
+| 200       | 10000            | 2000000      | 27             | 12679                |
 
-![](doc/assets/2/2_1.png)
-![](doc/assets/2/2_2.png)
+![](doc/assets/2/2.png)
 
 3. The running time for the above is reported by time for the above and report the time. The ratio of CPU time to REAL
    TIME tells you how many cores were effectively used in the computation. If you are close to 1 you have almost no
@@ -109,11 +108,12 @@ the program is shown below.
 4. The coin with the most 0s you managed to find.
    We were able to mine a coin with 6 leading zeros. The run is as follows.
 
-| Work Unit | Process Per Core | Cores | Max Process Spun | Max Attempts | Bitcoins Mined | Wall Clock Time (ms) |
-|-----------|------------------|-------|------------------|--------------|----------------|----------------------|
-| 50        | 50000            | 8     | 400000           | 20000000     | 2              | 1509781              |
+| Work Unit | Max Process Spun | Max Attempts | Bitcoins Mined | Wall Clock Time (ms) |
+|-----------|------------------|--------------|----------------|----------------------|
+| 200       | 200000           | 40000000     | 2              | 1509781              |
 
 ![](doc/assets/MaxLeadingZeros.png)
 
 5. The largest number of working machines you were able to run your code with.
-   Since, we are a group of two persons, I tried using working machines.
+   
+Since, we are a group of two persons, I tried using working machines.
