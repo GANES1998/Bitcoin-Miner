@@ -3,17 +3,16 @@
 -export([supervise/1, main_loop/3]).
 
 supervise(K) ->
-  io:format("K is ~p", [K]),
   %%Start Wallclock Time
   Start = util:get_timestamp(),
-  %%CPU Monitoring Initialization
-  _CpuStart = cpu_sup:util(),
+%%  %%CPU Monitoring Initialization
+%%  _CpuStart = cpu_sup:util(),
   %% Get Work Unit (Number of attepmts by each process before giving up)  from Env
   WorkUnit = list_to_integer(os:getenv("WORK_UNIT", "100")),
   %% Get Total Logical Cores in the system
   Cores = erlang:system_info(logical_processors_available),
   %% Calculate Max Processes to be spun using Cores * Process per core (Taken form ENV Vars)
-  MaxProcesses = Cores * os:getenv("PROCESS_PER_CORE", 2500),
+  MaxProcesses = Cores * list_to_integer(os:getenv("PROCESS_PER_CORE", "2500")),
   %% Spun MaxProcesses times individual processes (workers)
   lists:foreach(
     fun(_) ->
@@ -26,9 +25,9 @@ supervise(K) ->
   %% Calculate End Wall Clock time.
   End = util:get_timestamp(),
   %% Stop the CPU Monitoring.
-  CpuEnd = cpu_sup:util(),
-  %% Print the CPU Utilization
-  io:format("Cup Time [~p]", [CpuEnd]),
+%%  CpuEnd = cpu_sup:util(),
+%%  %% Print the CPU Utilization
+%%  io:format("Cup Time [~p]", [CpuEnd]),
   %% Print the result with stats
   io:format("[~p] processes took [~p] milli seconds running on [~p] logical cores with Work Unit [~p] ~n", [MaxProcesses, End - Start, Cores, WorkUnit]).
 
