@@ -18,7 +18,7 @@ supervise(K) ->
   %% Connect to all workers
   lists:foreach(
     fun(Worker) ->
-      net_kernel:connect_node(Worker)
+      net_kernel:connect_node(list_to_atom(Worker))
     end,
     DedicatedWorkers
   ),
