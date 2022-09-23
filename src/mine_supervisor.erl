@@ -8,7 +8,7 @@ supervise(K) ->
   %% Start CPU time
   statistics(runtime),
   %% Start Wallclock Time
-  Start = util:get_timestamp(),
+  statistics(wall_clock),
   %% Get Work Unit (Number of attepmts by each process before giving up)  from Env
   WorkUnit = list_to_integer(os:getenv(?work_unit_property, "100")),
   %% Max Processes to be spun to mine bitcoin. Defaults to 100000
@@ -39,10 +39,8 @@ supervise(K) ->
   main_loop(0, 0, MaxProcesses),
   %% Stop the CPU Monitoring.
   {_, CPUTime} = statistics(runtime),
-  %% Stop Wall Clock timer
-  End = util:get_timestamp(),
   %% Calculate wall clock time
-  WallClockTime = End - Start,
+  {_, WallClockTime} = statistics(wall_clock),
   %% Print the result with stats
   io:format("[~p] processes took [~p] milli seconds CPU Time and [~p] milli seconds Wall clock time with Work Unit [~p] ~n", [MaxProcesses, CPUTime, WallClockTime, WorkUnit]),
   Speedup = CPUTime/WallClockTime,
