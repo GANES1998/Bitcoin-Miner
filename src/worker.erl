@@ -1,5 +1,7 @@
 -module(worker).
 -export([mine/3, main/2, mine_until_found/6]).
+-define(random_suffix_property, "RANDOM_SUFFIX_LEN").
+-define(work_unit_property, "WORK_UNIT").
 
 -record(state, {
   recurse_level,
@@ -8,9 +10,9 @@
 
 mine(K, CallerPid,  #state{recurse_level = _RecurseLevel, user_id = UserId} = _) ->
   %% Get Random Char count from environment variables.
-  RandomCharCount = os:getenv("RANDOM_SUFFIX_LEN", 12),
+  RandomCharCount = os:getenv(?random_suffix_property, 12),
   %% Get Work Unit from Env Vars.
-  WorkUnit = list_to_integer(os:getenv("WORK_UNIT", "100")),
+  WorkUnit = list_to_integer(os:getenv(?work_unit_property, "100")),
   %% Mine until a successful mine or Work Unit attempts are exhausted.
   mine_until_found(1, WorkUnit, RandomCharCount, UserId, K, CallerPid).
 

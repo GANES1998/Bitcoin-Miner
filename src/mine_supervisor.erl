@@ -1,6 +1,8 @@
 -module(mine_supervisor).
 
 -export([supervise/1, main_loop/3]).
+-define(work_unit_property, "WORK_UNIT").
+-define(max_processes_property, "MAX_PROCESSES").
 
 supervise(K) ->
   %% Start CPU time
@@ -8,15 +10,28 @@ supervise(K) ->
   %% Start Wallclock Time
   Start = util:get_timestamp(),
   %% Get Work Unit (Number of attepmts by each process before giving up)  from Env
-  WorkUnit = list_to_integer(os:getenv("WORK_UNIT", "100")),
-  %% Get Total Logical Cores in the system
-  Cores = erlang:system_info(logical_processors_available),
-  %% Calculate Max Processes to be spun using Cores * Process per core (Taken form ENV Vars)
-  MaxProcesses = Cores * list_to_integer(os:getenv("PROCESS_PER_CORE", "2500")),
-  %% Spun MaxProcesses times individual processes (workers)
+  WorkUnit = list_to_integer(os:getenv(?work_unit_property, "100")),
+  %% Max Processes to be spun to mine bitcoin. Defaults to 100000
+  MaxProcesses = list_to_integer(os:getenv(?max_processes_property, "100000")),
+  %% Get all dedicated ready to serve the servers request
+  DedicatedWorkers = util:get_dedicated_workers(),
+  %% Connect to all workers
   lists:foreach(
-    fun(_) ->
-      _Pid = spawn_link(worker, main, [K, self()])
+    fun(Worker) ->
+      net_kernel:connect_node(Worker)
+    end,
+    DedicatedWorkers
+  ),
+  %% Find All Workers
+  AllWorkers = lists:append(nodes(), [node()]),
+  %% Get total number of workers
+  WorkersCount = lists:flatlength(AllWorkers),
+  io:format("Starting to spawn process from supervisor [~p] to workers in [~p]", [node(), AllWorkers]),
+  %% Spun MaxProcesses in Round robin fashion across all worker nodes. Supervisor node will also have workers.
+  lists:foreach(
+    fun(Index) ->
+      WorkerIndex = (Index rem WorkersCount) + 1,
+      _Pid = spawn_link(lists:nth(WorkerIndex, AllWorkers), worker, main, [K, self()])
     end,
     lists:seq(1, MaxProcesses)
   ),
@@ -24,11 +39,12 @@ supervise(K) ->
   main_loop(0, 0, MaxProcesses),
   %% Stop the CPU Monitoring.
   {_, CPUTime} = statistics(runtime),
-  %% Calculate Wall Clock time.
+  %% Stop Wall Clock timer
   End = util:get_timestamp(),
+  %% Calculate wall clock time
   WallClockTime = End - Start,
   %% Print the result with stats
-  io:format("[~p] processes took [~p] milli seconds CPU Time and [~p] milli seconds Wall clock time running on [~p] logical cores with Work Unit [~p] ~n", [MaxProcesses, CPUTime, WallClockTime, Cores, WorkUnit]),
+  io:format("[~p] processes took [~p] milli seconds CPU Time and [~p] milli seconds Wall clock time with Work Unit [~p] ~n", [MaxProcesses, CPUTime, WallClockTime, WorkUnit]),
   Speedup = CPUTime/WallClockTime,
   io:format("Speedup Achieved: ~p~n", [Speedup]).
 
