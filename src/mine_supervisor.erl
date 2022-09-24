@@ -1,6 +1,6 @@
 -module(mine_supervisor).
 
--export([supervise/1, main_loop/3]).
+-export([supervise/1, main_loop/3, spawn_worker/5, spawn_loop/5]).
 -define(work_unit_property, "WORK_UNIT").
 -define(max_processes_property, "MAX_PROCESSES").
 
@@ -16,7 +16,7 @@ supervise(K) ->
   %% Max Processes to be spun to mine bitcoin. Defaults to 100000
   MaxProcesses = list_to_integer(os:getenv(?max_processes_property, "100000")),
   %% Spun MaxProcesses in Round robin fashion across all worker nodes. Supervisor node will also have workers.
-  spawn_loop(K, MaxProcesses, 1, [node()]),
+  spawn_loop(K, WorkUnit, MaxProcesses, 1, [node()]),
   %% Listening for result messages
   io:format("Listening for result messages from workers [~p]~n", [lists:append([node()], nodes())]),
   %% Start the event listening part.
@@ -33,7 +33,7 @@ supervise(K) ->
   Speedup = CPUTime / WallClockTime,
   io:format("Speedup Achieved: ~p~n", [Speedup]).
 
-spawn_worker(K, MaxProcesses, CurrentWorkerIndex, Workers) ->
+spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers) ->
   %% Get total workers count.
   WorkersCount = lists:flatlength(Workers),
   %% Get the index of the worker in round robin fashion - chose one of the workers
@@ -41,9 +41,9 @@ spawn_worker(K, MaxProcesses, CurrentWorkerIndex, Workers) ->
   %% Spawn and link a new process in the chosen worker
   _Pid = spawn_link(lists:nth(WorkerIndex, Workers), worker, main, [K, self()]),
   %% Again spawn the new process, while listening for new worker to join.
-  spawn_loop(K, MaxProcesses, CurrentWorkerIndex + 1, Workers).
+  spawn_loop(K, WorkUnit, MaxProcesses, CurrentWorkerIndex + 1, Workers).
 
-spawn_loop(K, MaxProcesses, CurrentWorkerIndex, Workers) ->
+spawn_loop(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers) ->
   %% Check if all process have been spun
   case CurrentWorkerIndex =< MaxProcesses of
     %% If more process needs to be spun
@@ -56,14 +56,14 @@ spawn_loop(K, MaxProcesses, CurrentWorkerIndex, Workers) ->
             {connect, Worker} ->
               %% Add the worker to the list of known workers.
               io:format("Successfully registered worker [~p]~n", [Worker]),
-              spawn_worker(K, MaxProcesses, CurrentWorkerIndex, lists:append(Workers, [Worker]))
+              spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, lists:append(Workers, [Worker]))
           after 10 ->
             %% No new worker has requested to join the network, so, again spawn with same workers.
-            spawn_worker(K, MaxProcesses, CurrentWorkerIndex, Workers)
+            spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers)
           end;
         true ->
           %% If this spawning is not one of 100 spawning. Again spawn the next process.
-          spawn_worker(K, MaxProcesses, CurrentWorkerIndex, Workers)
+          spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers)
       end;
     %% After all the processes [MaxProcesses] have been spun, check output the details to console.
     false -> io:format("All [~p] processes successfully spun among workers [~p]~n", [MaxProcesses, Workers])
@@ -85,13 +85,13 @@ main_loop(WorkerCount, SuccessCount, MaxProcesses) ->
   case WorkerCount < MaxProcesses of
     %% If there are are more workers yet to report result,
     true -> receive
-    %% If the worker has successfully mined a bitcoin
+            %% If the worker has successfully mined a bitcoin
               {success, _WorkerPid, HashInputString, Sha256, Node} ->
                 %% Print the result from that worker
                 io:format("~p\t~p\t~p~n", [HashInputString, Sha256, Node]),
                 %% Since, we have more workers yet to report result, again listen for messages from worker.
                 main_loop(WorkerCount + 1, SuccessCount + 1, MaxProcesses);
-    %% If the worker isn't able to mine bitcoin
+            %% If the worker isn't able to mine bitcoin
               {nosuccess, _} ->
                 %% Since, we have more workers yet to report result, again listen for messages from worker.
                 main_loop(WorkerCount + 1, SuccessCount, MaxProcesses)
