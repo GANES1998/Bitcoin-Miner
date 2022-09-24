@@ -75,12 +75,12 @@ graph TB;
 
 1. Fill the [constants.env](constants.env) with appropriate values.
 
-   |Variable Name|                                                                                           |
-         |-------------------------------------------------------------------------------------------|-----------------------|
-   |MASTER_NODE  | Node name of the master node of format name@ip                                            |
-   |ERLANG_COOKIE  | Cookie used to sync two nodes to same network                                             |
-   |DEDICATED_WORKER_NODE  | Node name of the dedicated worker node.<br/> Required when having a dedicated worker node |
-   |ERLANG_BIN  | Absolute path to erlang bin.                                                              |
+   | Variable Name         | Use                                                                                                        |
+   |-----------------------|------------------------------------------------------------------------------------------------------------|
+   | MASTER_NODE           | Node name of the master node of format name@ip                                                             |
+   | ERLANG_COOKIE         | Cookie used to sync two nodes to same network                                                              |
+   | DEDICATED_WORKER_NODE | Node name of the dedicated worker node.<br/> Required when having a dedicated worker node                  |
+   | ERLANG_BIN            | Absolute path to erlang bin.                                                                               |
 
 2. Execute ```./project1.sh K``` where `K` is the number of leading zeros expected.
 3. In another node - dedicated worker node, execute ```./project1dedworker.sh ip``` where `ip` is the ip of the server.
@@ -151,6 +151,6 @@ Since, we are a group of two persons, I tried using working machines. The result
 
 | Work Unit | Max Process Spun | Max Attempts | Bitcoins Mined (leading 6) | Wall Clock Time (ms) |
 |-----------|------------------|--------------|----------------------------|----------------------|
-| 100       | 100000           | 10000000     |                            |                      |
+| 200       | 200000           | 40000000     | 3                          | 861728               |
 
 
