@@ -38,8 +38,10 @@ G --Dispatch--> A
 graph TB;
     A[K zeros] --User Input--> B[Supervisor];
     B ---> C[Find the number of processes to be spun];
-    D[Environment Var] --Max Processes--> C;
-    C ---> E[Spawn Processes];
+    C ---> L[Get All Workers];
+    D -.-> |Dedicated Worker Nodes|L;
+    D[Environment Var] -.-> |Max Processes|C;
+    L ---> E[Spawn Processes - Round Robin];
     E ---> F[Listen for Events];
     F --loop--> F;
     H[Workers] --Resul tMessage--> F; 
