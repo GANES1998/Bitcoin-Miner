@@ -38,10 +38,8 @@ G --Dispatch--> A
 graph TB;
     A[K zeros] --User Input--> B[Supervisor];
     B ---> C[Find the number of processes to be spun];
-    C ---> L[Get All Workers];
-    D -.-> |Dedicated Worker Nodes|L;
     D[Environment Var] -.-> |Max Processes|C;
-    L ---> E[Spawn Processes - Round Robin];
+    C ---> E[Spawn Processes - Round Robin];
     E -.-> |Every 100 spuns| P[Listen for worker connections];
     P -.-> M{New worker?};
     M -.-> |Yes| N[Add worker to workers]; 
@@ -53,6 +51,7 @@ graph TB;
     F ---> I{Message Type};
     I -->|Yes| J[Update Counts, print result];
     I -->|No| K[No Change to state]
+    
 ```
 
 #### Architecture of Worker
