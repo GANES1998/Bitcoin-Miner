@@ -39,7 +39,7 @@ spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers) ->
   %% Get the index of the worker in round robin fashion - chose one of the workers
   WorkerIndex = (CurrentWorkerIndex rem WorkersCount) + 1,
   %% Spawn and link a new process in the chosen worker
-  _Pid = spawn_link(lists:nth(WorkerIndex, Workers), worker, main, [K, self()]),
+  _Pid = spawn_link(lists:nth(WorkerIndex, Workers), worker, main, [K, WorkUnit, self()]),
   %% Again spawn the new process, while listening for new worker to join.
   spawn_loop(K, WorkUnit, MaxProcesses, CurrentWorkerIndex + 1, Workers).
 

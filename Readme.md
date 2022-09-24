@@ -42,7 +42,12 @@ graph TB;
     D -.-> |Dedicated Worker Nodes|L;
     D[Environment Var] -.-> |Max Processes|C;
     L ---> E[Spawn Processes - Round Robin];
-    E ---> F[Listen for Events];
+    E -.-> |Every 100 spuns| P[Listen for worker connections];
+    P -.-> M{New worker?};
+    M -.-> |Yes| N[Add worker to workers]; 
+    N -.-> E;
+    M -.-> |No| E;
+    E ---> |After All process are spun| F[Listen for Events];
     F --loop--> F;
     H[Workers] --Resul tMessage--> F; 
     F ---> I{Message Type};
@@ -54,19 +59,44 @@ graph TB;
 
 ```mermaid
 graph TB;
-    A[Initialized After getting spun] ---> B[Get Work Unit];
-    C[Environment Vars] -.-> B;
-    B ---> D[Loop];
-    D -.-> E[Generate Random Str];
-    C -.-> |Random Char Count| E;
+    A[Initialized After getting spun] ---> D[Loop];
+    D ---> E[Generate Random Str];
+    C[Environment Vars] -.-> |Random Char Count| E;
     E ---> F[Generate Input String];
-    G[User Input] -.-> |User Id| F;
+    G[State] -.-> |User Id| F;
     F ---> H[Sha256 Hash];
     H ---> I{Leading Zeros Check};
     G -.-> |K - Min Leading Zeros| I;
     I ---> |Yes| J[Send Message to Caller with Input String and Hash];
     I ---> |No - Loop for maximum of work unit times| D;
 ```
+
+#### Steps of Execution
+
+1. Fill the [constants.env](constants.env) with appropriate values.
+
+   |Variable Name|                                                                                           |
+         |-------------------------------------------------------------------------------------------|-----------------------|
+   |MASTER_NODE  | Node name of the master node of format name@ip                                            |
+   |ERLANG_COOKIE  | Cookie used to sync two nodes to same network                                             |
+   |DEDICATED_WORKER_NODE  | Node name of the dedicated worker node.<br/> Required when having a dedicated worker node |
+   |ERLANG_BIN  | Absolute path to erlang bin.                                                              |
+
+2. Execute ```./project1.sh K``` where `K` is the number of leading zeros expected.
+3. In another node - dedicated worker node, execute ```./project1dedworker.sh ip``` where `ip` is the ip of the server.
+
+*Note*
+
+The server is assumed to have a name of master. The server name should be master@ip.
+
+**Supervisor Side**
+
+![supervisor_op.png](doc/assets/supervisor_op.png)
+
+**Worker Side**
+
+![worker_op.png](doc/assets/worker_op.png)
+
 
 #### Answers
 
@@ -106,7 +136,6 @@ the program is shown below.
    parallelism (points will be subtracted).
 
 
-
 4. The coin with the most 0s you managed to find.
    We were able to mine a coin with 6 leading zeros. The run is as follows.
 
@@ -117,5 +146,11 @@ the program is shown below.
 ![](doc/assets/MaxLeadingZeros.png)
 
 5. The largest number of working machines you were able to run your code with.
-   
-Since, we are a group of two persons, I tried using working machines.
+
+Since, we are a group of two persons, I tried using working machines. The results are as follows.
+
+| Work Unit | Max Process Spun | Max Attempts | Bitcoins Mined (leading 6) | Wall Clock Time (ms) |
+|-----------|------------------|--------------|----------------------------|----------------------|
+| 100       | 100000           | 10000000     |                            |                      |
+
+
