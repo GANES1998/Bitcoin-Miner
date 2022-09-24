@@ -1,5 +1,5 @@
 -module(worker).
--export([mine/3, main/2, mine_until_found/6]).
+-export([mine/3, main/2, mine_until_found/6, main_dedicated/1]).
 -define(random_suffix_property, "RANDOM_SUFFIX_LEN").
 -define(work_unit_property, "WORK_UNIT").
 
@@ -29,7 +29,7 @@ mine_until_found(AttemptNumber, WorkUnit, RandomCharCount, UserId, K, Supervisor
   case string:left(Sha256Hash, K) == ZeroStr of
     true ->
       %% If so, we have successfully mined a bitcoin and thus report to supervisor and die.
-      SupervisorPid ! {success, self(), HashInputString, Sha256Hash};
+      SupervisorPid ! {success, self(), HashInputString, Sha256Hash, node()};
     false ->
       %% Check if we can attempt again using Work Unit and Attempt Number
       case AttemptNumber < WorkUnit of
@@ -46,3 +46,13 @@ mine_until_found(AttemptNumber, WorkUnit, RandomCharCount, UserId, K, Supervisor
 main(K, SupervisorPid) ->
   mine(K, SupervisorPid, #state{recurse_level = 0, user_id = "g.ravichandran"}).
 
+main_dedicated(MasterIp) ->
+  register(?MODULE, self()),
+  MasterNode = list_to_atom(string:concat("master@", MasterIp)),
+  io:format("Contacting Master [~p]~n", [MasterNode]),
+  net_kernel:connect_node(MasterNode),
+  io:format("Success Contacting Master [~p]~n", [MasterNode]),
+  {mine_supervisor, MasterNode} ! {connect, node()},
+  receive
+    {stop} -> io:format("Stop received from master")
+  end.
