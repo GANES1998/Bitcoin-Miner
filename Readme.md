@@ -8,8 +8,8 @@ of [COP5615](https://ufl.instructure.com/courses/467300).
 
 | Name                     | Gator Email             | UF Id     | Github username |
 |--------------------------|-------------------------|-----------|-----------------|
-| Ravichandran, Ganeson    | g.ravichandran@ufl.edu  | 1079-8982 | GANES1998       |
-| Munaga, Sai Pavan Kalyan | saipavan.munaga@ufl.edu | xxxx-xxxx |                 |
+| Ravichandran, Ganeson    | g.ravichandran@ufl.edu  | 10798982 | GANES1998       |
+| Munaga, Sai Pavan Kalyan | saipavan.munaga@ufl.edu | 88769245 | saipavankalyan  |
 
 #### Architecture
 
@@ -83,7 +83,7 @@ graph TB;
 
 2. Execute ```./project1.sh K``` where `K` is the number of leading zeros expected.
 3. In another node - dedicated worker node, execute ```./project1dedworker.sh ip``` where `ip` is the ip of the server.
-
+| [](doc/assets/3_speedup.jpg)
 *Note*
 
 The server is assumed to have a name of master. The server name should be master@ip.
@@ -134,6 +134,7 @@ the program is shown below.
    TIME tells you how many cores were effectively used in the computation. If you are close to 1 you have almost no
    parallelism (points will be subtracted).
 
+![](doc/assets/3_speedup.jpg)
 
 4. The coin with the most 0s you managed to find.
    We were able to mine a coin with 6 leading zeros. The run is as follows.
@@ -151,5 +152,3 @@ Since, we are a group of two persons, I tried using working machines. The result
 | Work Unit | Max Process Spun | Max Attempts | Bitcoins Mined (leading 6) | Wall Clock Time (ms) |
 |-----------|------------------|--------------|----------------------------|----------------------|
 | 200       | 200000           | 40000000     | 3                          | 861728               |
-
-

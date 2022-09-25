@@ -57,7 +57,7 @@ spawn_loop(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers) ->
               %% Add the worker to the list of known workers.
               io:format("Successfully registered worker [~p]~n", [Worker]),
               spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, lists:append(Workers, [Worker]))
-          after 10 ->
+          after 1 ->
             %% No new worker has requested to join the network, so, again spawn with same workers.
             spawn_worker(K, WorkUnit, MaxProcesses, CurrentWorkerIndex, Workers)
           end;
