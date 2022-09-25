@@ -9,7 +9,7 @@ of [COP5615](https://ufl.instructure.com/courses/467300).
 | Name                     | Gator Email             | UF Id     | Github username |
 |--------------------------|-------------------------|-----------|-----------------|
 | Ravichandran, Ganeson    | g.ravichandran@ufl.edu  | 10798982 | GANES1998       |
-| Munaga, Sai Pavan Kalyan | saipavan.munaga@ufl.edu | 88769245 | saipavankalyan  |
+| Munaga, Sai Pavan Kalyan | saipavank.munaga@ufl.edu | 88769245 | saipavankalyan  |
 
 #### Architecture
 
